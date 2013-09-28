@@ -3,6 +3,11 @@ require 'jumpstart_auth'
 class MicroBlogger
   attr_reader :client
 
+  def dm(target, message)
+     puts "d #{target} Trying to send this DM:"
+     @client.direct_message_create(target, message)
+  end
+
   def tweet(message)
     if message.length <= 140
       @client.update(message)
@@ -20,8 +25,9 @@ class MicroBlogger
     parts = input.split
     command = parts[0]
     case command
-    when 'q' then puts "Goodbye!"
-    when 't' then tweet(parts[1..-1].join(" "))
+      when 'q' then puts "Goodbye!"
+      when 't' then tweet(parts[1..-1].join(" "))
+      when 'dm' then dm(parts[1], parts[2..-1].join(" "))
     else
       puts "Sorry, I don't know how to (#{command})"
   end
