@@ -1,6 +1,6 @@
 require 'jumpstart_auth'
 require 'bitly'
-
+require 'klout'
 
 class MicroBlogger
   attr_reader :client
@@ -74,6 +74,21 @@ class MicroBlogger
     Bitly.new('hungryacademy', 'R_430e9f62250186d2612cca76eee2dbc6')
   end
 
+  def klout_score
+    friends = @client.friends.collect { |f| f.screen_name }
+    friends.each do |friend|
+      begin
+        identity = Klout::Identity.find_by_screen_name(friend)
+        user     = Klout::User.new(identity.id)
+        score    = user.score.score.to_s
+        print "#{friend}'s score: #{score[0..2]}"
+      rescue
+        print "Sorry, #{friend} doesn't have a Klout account"
+      end
+      puts "" # Print a blank line to separate each friend
+    end
+  end
+
   def run
     input = ""
     while input != "q"
@@ -94,6 +109,7 @@ def process_command(command, parts)
       when "elt"   then everyones_last_tweet
       when "s"     then puts shorten_url(parts[1])
       when "turl"  then tweet_with_url(parts[1..-1])
+      when "klout" then klout_score
     else
       puts "Sorry, I don't know how to (#{command})"
   end
@@ -104,7 +120,10 @@ def process_command(command, parts)
     puts "Initializing..."
     @client = JumpstartAuth.twitter
     Bitly.use_api_version_3
+    Klout.api_key = 'xu9ztgnacmjx3bu82warbr3h'
   end
-end
+
 blogger = MicroBlogger.new
 blogger.run
+blogger.klout_score
+end
