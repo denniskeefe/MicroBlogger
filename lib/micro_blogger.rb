@@ -1,5 +1,5 @@
 require 'jumpstart_auth'
-
+require 'bitly'
 
 
 class MicroBlogger
@@ -46,6 +46,34 @@ class MicroBlogger
     end
   end
 
+  def shorten_url(original_url)
+    unless original_url.nil?
+      puts "Shortening this URL: #{original_url}"
+      @bitly ||= bitly_auth
+      @bitly.shorten(original_url).short_url
+    else
+      puts "ERROR: Need to provide a URL."
+    end
+  end
+
+  def uri?(string)
+    uri = URI.parse(string)
+    %w( http https ).include?(uri.scheme)
+    rescue URI::BadURIError
+      false
+    rescue URI::InvalidURIError
+      false
+  end
+
+  def tweet_with_url(parts)
+    parts.collect! { |word| uri?(word) ? shorten_url(word) : word}
+    tweet(parts.join(" "))
+  end
+
+  def bitly_auth
+    Bitly.new('hungryacademy', 'R_430e9f62250186d2612cca76eee2dbc6')
+  end
+
   def run
     input = ""
     while input != "q"
@@ -64,6 +92,8 @@ def process_command(command, parts)
       when 'dm' then dm(parts[1], parts[2..-1].join(" "))
       when 'spam' then spam_my_followers parts [1..-1].join(" ")
       when "elt"   then everyones_last_tweet
+      when "s"     then puts shorten_url(parts[1])
+      when "turl"  then tweet_with_url(parts[1..-1])
     else
       puts "Sorry, I don't know how to (#{command})"
   end
@@ -73,6 +103,7 @@ def process_command(command, parts)
   def initialize
     puts "Initializing..."
     @client = JumpstartAuth.twitter
+    Bitly.use_api_version_3
   end
 end
 blogger = MicroBlogger.new
