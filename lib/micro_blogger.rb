@@ -11,6 +11,28 @@ class MicroBlogger
      screen_names = @client.followers.collect{|follower| follower.screen_name}
   end
 
+def help
+    """
+    == DESCRIPTION
+
+    MicroBlogger is a terminal Twitter Client,
+    built by Brian Winterling and Nathaniel Watts
+
+    == COMMAND SYNTAX
+    command content_1 content_2 (no special characters required)
+
+    == COMMANDS
+    t message          :: Tweet out a message, using your Twitter Account!
+    dm user message    :: Tweet out a direct message to a specific user
+    turl message       :: Tweet out a message and shorten any url with Bit.ly
+    spam message       :: Tweet a direct message to all of your friends
+    elt                :: Return a list of your friends' last tweets
+    s url              :: Shorten a URL with Bit.ly
+    q                  :: Quit this application
+    klout              :: Get the Klout scores for all of your friends
+    help               :: View help information
+    """
+  end
   
 
   def tweet(message)
