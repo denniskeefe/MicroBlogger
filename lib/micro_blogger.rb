@@ -132,6 +132,7 @@ def process_command(command, parts)
       when "s"     then puts shorten_url(parts[1])
       when "turl"  then tweet_with_url(parts[1..-1])
       when "klout" then klout_score
+      when "help"  then puts help
     else
       puts "Sorry, I don't know how to (#{command})"
   end
